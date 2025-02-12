@@ -64,7 +64,14 @@
 
 ## 사용 방법
 
-1. Jupyter Notebook에서 실행. 아래는 필수 라이브러리와 모델 설정하는 코드
+0. Jupyter Notebook에서 실행. 아래는 필수 라이브러리와 모델 설정하는 코드
+
+    ```python
+    !"{sys.executable}" -m pip install --upgrade pip
+    !"{sys.executable}" -m pip install numpy
+    !"{sys.executable}" -m pip install tensorflow
+    !"{sys.executable}" -m pip install StandardScaler
+    ```
 
     ```python
     import sys
