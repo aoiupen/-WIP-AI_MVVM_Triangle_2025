@@ -2,17 +2,22 @@
 
 삼각형의 세 변이 주어졌을 때, 그 세 변으로 삼각형을 만들 수 있는지 예측하는 AI 모델을 구현
 
+## 소스 코드 대신 실행 파일로 사용하는 방법
+
+`main_pyside.exe` 다운로드 후 실행
+
 ## 요구사항
 
 - Python 3.10.11 (pyenv로 관리)
 - numpy
 - tensorflow
+- scikit-learn
 
 ## 데이터셋
 
 *   **생성 방법:** `gen_triangle_sides` 함수를 사용하여 유효한 삼각형과 유효하지 않은 삼각형의 데이터를 각각 1000개씩 생성. 각 데이터는 세 변의 길이로 구성.
 *   **데이터 형식:** (3, 1) 형태의 NumPy 배열
-*   **전처리:** 데이터는 0~255 사이의 정수값을 가지며, 모델 학습 전에 255.0으로 나누어 정규화.
+*   **전처리:** 데이터는 StandardScaler를 사용하여 정규화.
 
 ## 모델 구조
 
@@ -48,17 +53,16 @@
     .\venv\Scripts\activate
     ```
 
-
-
-## 사용 방법
-
-0. Jupyter Notebook에서 필요한 라이브러리 설치:
+4. 필요한 라이브러리 설치:
 
     ```bash
-    !"{sys.executable}" -m pip install numpy
-    !"{sys.executable}" -m pip install tensorflow
-    !"{sys.executable}" -m pip install --upgrade pip
+    pip install --upgrade pip
+    pip install numpy
+    pip install tensorflow
+    pip install scikit-learn
     ```
+
+## 사용 방법
 
 1. Jupyter Notebook에서 실행. 아래는 필수 라이브러리와 모델 설정하는 코드:
 
@@ -67,6 +71,7 @@
     import numpy as np
     import tensorflow as tf
     from tensorflow.keras import layers, models
+    from sklearn.preprocessing import StandardScaler
 
     MIN_LEN = 1 # 최소 길이
     MAX_LEN = 1000 # 최대 길이
@@ -110,33 +115,28 @@
 3. 데이터를 생성하여 모델 학습에 사용:
 
     ```python
-    num_samples = 100000
+    num_samples = 1000000
     success_cases, fail_cases = gen_triangle_sides(num_samples)
     ```
 
-4. 원핫코딩을 하고 데이터 섞기 및 정규화:
+4. 데이터 정규화:
 
     ```python
-    labels = np.concatenate([np.ones(len(success_cases)), np.zeros(len(fail_cases))])
-
-    success_indices = np.arange(len(success_cases))
-    fail_indices = np.arange(len(fail_cases))
-
-    np.random.shuffle(success_indices)
-    np.random.shuffle(fail_indices)
-
-    rand_success_cases = success_cases[success_indices]
-    rand_fail_cases = fail_cases[fail_indices]
-
-    norm_success_cases = rand_success_cases / 255.0
-    norm_fail_cases = rand_fail_cases / 255.0
+    scaler = StandardScaler()
+    norm_success_cases = scaler.fit_transform(success_cases.reshape(-1, 3)).reshape(-1, 3, 1)
+    norm_fail_cases = scaler.fit_transform(fail_cases.reshape(-1, 3)).reshape(-1, 3, 1)
     ```
 
-5. 모델 생성과과 학습:
+5. 성공/실패 케이스 결합 및 레이블 생성:
 
     ```python
     triangles = np.concatenate([norm_success_cases, norm_fail_cases])
+    labels = np.concatenate([np.ones(num_samples), np.zeros(num_samples)])
+    ```
 
+6. 모델 생성과 학습:
+
+    ```python
     model = models.Sequential([
         layers.Flatten(input_shape=(3, 1)),
         layers.Dense(64, activation='relu'),
@@ -151,7 +151,7 @@
     print(f'Test Accuracy: {accuracy}')
     ```
 
-6. 예측 테스트:
+7. 예측 테스트:
 
     ```python
     example = np.array([1, 2.1, 1])
@@ -159,3 +159,9 @@
     predictions = model.predict(single_traiangle_coors)
     predictions # 예측 결과 출력 (0에 가까울수록 False 1에 가까울수록 True)
     ```
+
+## 결과 시각화
+
+다음은 모델의 예측 결과를 시각화한 이미지입니다:
+
+![예측 결과 시각화](visual.png)
