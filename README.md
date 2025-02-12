@@ -2,7 +2,7 @@
 
 삼각형의 세 변이 주어졌을 때, 그 세 변으로 삼각형을 만들 수 있는지 예측하는 AI 모델을 구현
 
-## 소스 코드 대신 실행 파일로 사용하는 방법
+## (준비중) 소스 코드 대신 실행 파일로 사용하는 방법
 
 `main_pyside.exe` 다운로드 후 실행
 
@@ -41,19 +41,19 @@
     pyenv local 3.10.11
     ```
 
-2. 가상환경 생성:
+2. 가상환경 생성
 
     ```bash
     python -m venv .venv
     ```
 
-3. 가상환경 활성화 (Windows):
+3. 가상환경 활성화 (Windows)
 
     ```bash
     .\venv\Scripts\activate
     ```
 
-4. 필요한 라이브러리 설치:
+4. 필요한 라이브러리 설치
 
     ```bash
     pip install --upgrade pip
@@ -64,7 +64,7 @@
 
 ## 사용 방법
 
-1. Jupyter Notebook에서 실행. 아래는 필수 라이브러리와 모델 설정하는 코드:
+1. Jupyter Notebook에서 실행. 아래는 필수 라이브러리와 모델 설정하는 코드
 
     ```python
     import sys
@@ -78,7 +78,7 @@
     INPUT_SHAPE = (3, 1)
     ```
 
-2. 성공/실패 케이스를 각각 `num_samples` 갯수만큼 생성하는 함수:
+2. 성공/실패 케이스를 각각 `num_samples` 갯수만큼 생성하는 함수
 
     ```python
     def gen_triangle_sides(num_samples):
@@ -112,14 +112,14 @@
         return True if others_len > max_len else False
     ```
 
-3. 데이터를 생성하여 모델 학습에 사용:
+3. 데이터를 생성하여 모델 학습에 사용
 
     ```python
     num_samples = 1000000
     success_cases, fail_cases = gen_triangle_sides(num_samples)
     ```
 
-4. 데이터 정규화:
+4. 데이터 정규화
 
     ```python
     scaler = StandardScaler()
@@ -127,14 +127,14 @@
     norm_fail_cases = scaler.fit_transform(fail_cases.reshape(-1, 3)).reshape(-1, 3, 1)
     ```
 
-5. 성공/실패 케이스 결합 및 레이블 생성:
+5. 성공/실패 케이스 결합 및 레이블 생성
 
     ```python
     triangles = np.concatenate([norm_success_cases, norm_fail_cases])
     labels = np.concatenate([np.ones(num_samples), np.zeros(num_samples)])
     ```
 
-6. 모델 생성과 학습:
+6. 모델 생성과 학습
 
     ```python
     model = models.Sequential([
@@ -151,7 +151,7 @@
     print(f'Test Accuracy: {accuracy}')
     ```
 
-7. 예측 테스트:
+7. 예측 테스트
 
     ```python
     example = np.array([1, 2.1, 1])
@@ -162,6 +162,5 @@
 
 ## 결과 시각화
 
-다음은 모델의 예측 결과를 시각화한 이미지입니다:
-
-![예측 결과 시각화](visual.png)
+![예측 결과 시각화](src/visual.png)
+![예측 결과 시각화](src/visual2.png)

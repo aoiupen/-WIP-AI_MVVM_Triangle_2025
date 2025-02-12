@@ -153,7 +153,8 @@ class TriangleVisualizer(QWidget):
             data = np.array([[a, b, c]]) / 255.0  # 정규화
             self.prediction = self.model.predict(data)[0][0]
             result = "삼각형 가능" if self.prediction > 0.9 else "삼각형 불가능"
-            self.result_label.setText(f"결과: {result} (확률: {self.prediction:.2f})")
+            self.result_label.setText(f"결과")
+            #self.result_label.setText(f"결과: {result} (확률: {self.prediction:.2f})")
             self.canvas.set_sides_and_prediction(self.sides, self.prediction)
         except ValueError:
             self.result_label.setText("올바른 숫자를 입력하세요.")
