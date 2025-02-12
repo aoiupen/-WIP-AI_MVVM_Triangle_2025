@@ -2,7 +2,7 @@
 
 삼각형의 세 변이 주어졌을 때, 그 세 변으로 삼각형을 만들 수 있는지 예측하는 AI 모델을 구현
 
-## 소스 코드 대신 실행 파일로 사용하는 방법
+## (준비중) 소스 코드 대신 실행 파일로 사용하는 방법
 
 `main_pyside.exe` 다운로드 후 실행
 
@@ -64,7 +64,7 @@
 
 ## 사용 방법
 
-0. Jupyter Notebook에서 실행. 아래는 필수 라이브러리와 모델 설정하는 코드
+1. Jupyter Notebook에서 실행. 아래는 필수 라이브러리와 모델 설정하는 코드
 
     ```python
     !"{sys.executable}" -m pip install --upgrade pip
