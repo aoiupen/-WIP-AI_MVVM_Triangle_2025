@@ -6,28 +6,27 @@ from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, Q
 from PySide6.QtGui import QPainter, QPen, QFont
 from PySide6.QtCore import Qt
 
-
 # 모델 파일 경로 설정
 if getattr(sys, 'frozen', False):
-    # PyInstaller로 패키징된 실행 파일인 경우
     model_path = os.path.join(sys._MEIPASS, 'model.h5')
 else:
-    # 개발 환경인 경우
     model_path = 'model.h5'
 
-# 모델 로드
-try:
-    model = tf.keras.models.load_model(model_path)
-except Exception as e:
-    print(f"모델 로드 오류: {e}")
-    model = None
+class TriangleModel:
+    def __init__(self, model_path):
+        self.model = tf.keras.models.load_model(model_path)
+
+    def predict(self, sides):
+        data = np.array([sides]) / 255.0
+        prediction = self.model.predict(data)
+        return prediction.item()
 
 class Canvas(QFrame):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.sides = [0, 0, 0]
         self.prediction = 0
-        self.setFixedSize(300, 300)  # 캔버스 크기를 정사각형으로 고정
+        self.setFixedSize(300, 300)
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
     def set_sides_and_prediction(self, sides, prediction):
@@ -40,18 +39,16 @@ class Canvas(QFrame):
         painter.setRenderHint(QPainter.Antialiasing)
 
         width, height = self.width(), self.height()
-        center_x, center_y = width // 2, height // 2  # 그림 영역을 중앙으로 조정
+        center_x, center_y = width // 2, height // 2
         scale = 100 / max(self.sides) if max(self.sides) > 0 else 1
 
         a, b, c = [side * scale for side in self.sides]
 
-        # 긴 변(기준선) 그리기
         pen = QPen(Qt.black, 2)
         painter.setPen(pen)
         painter.drawLine(center_x - c / 2, center_y, center_x + c / 2, center_y)
         self.drawText(painter, center_x, center_y - 10, str(self.sides[2]))
 
-        # 원의 궤적 점선으로 그리기
         pen.setStyle(Qt.DotLine)
         pen.setColor(Qt.red)
         painter.setPen(pen)
@@ -63,9 +60,8 @@ class Canvas(QFrame):
         painter.drawEllipse(center_x + c / 2 - b, center_y - b, 2 * b, 2 * b)
         self.drawText(painter, center_x + c / 2 - b / 2, center_y - b / 2, str(self.sides[1]), align_right=True)
 
-        # 삼각형 가능하면 실선으로 꼭짓점 연결
         if self.prediction > 0.9:
-            h = np.sqrt(b**2 - ((b**2 - a**2 + c**2) / (2 * c))**2)
+            h = np.sqrt(b**2 - ((b**2 - a**2 + c**2) / (2 * c))**2) * self.prediction
             top_x = center_x + c / 2 - ((b**2 - a**2 + c**2) / (2 * c))
             top_y = center_y - h
             pen.setStyle(Qt.SolidLine)
@@ -74,7 +70,6 @@ class Canvas(QFrame):
             painter.drawLine(center_x - c / 2, center_y, top_x, top_y)
             painter.drawLine(center_x + c / 2, center_y, top_x, top_y)
         else:
-            # 삼각형 불가능할 때 수평으로 변을 배치
             pen.setStyle(Qt.SolidLine)
             pen.setColor(Qt.red)
             painter.setPen(pen)
@@ -86,7 +81,7 @@ class Canvas(QFrame):
             painter.drawLine(center_x + c / 2 - b, center_y - 20, center_x + c / 2, center_y - 20)
             self.drawText(painter, center_x + c / 2 - b / 2, center_y - 30, str(self.sides[1]))
 
-        painter.end()  # QPainter 객체 명시적으로 종료
+        painter.end()
 
     def drawText(self, painter, x, y, text, align_left=False, align_right=False):
         font = QFont()
@@ -99,26 +94,15 @@ class Canvas(QFrame):
         else:
             painter.drawText(x - 10, y, text)
 
-class TriangleVisualizer(QWidget):
-    def __init__(self):
+class TriangleView(QWidget):
+    def __init__(self, view_model):
         super().__init__()
+        self.view_model = view_model
         self.initUI()
-        try:
-            # model.h5 파일 경로 설정
-            if hasattr(sys, '_MEIPASS'):
-                model_path = os.path.join(sys._MEIPASS, 'model.h5')
-            else:
-                model_path = 'model.h5'
-            self.model = tf.keras.models.load_model(model_path)  # 모델 로드
-        except Exception as e:
-            self.result_label.setText(f"모델 로드 실패: {e}")
-            self.model = None
-        self.sides = [0, 0, 0]  # 입력된 변의 길이
-        self.prediction = 0  # 예측 결과
 
     def initUI(self):
         self.setWindowTitle("Triangle Predictor & Visualizer")
-        self.setFixedSize(320, 400)  # 윈도우 크기 고정 (300 + 좌우 패딩 10 * 2)
+        self.setFixedSize(320, 400)
 
         self.layout = QVBoxLayout()
         self.label = QLabel("세 변의 길이를 입력하세요:")
@@ -131,12 +115,12 @@ class TriangleVisualizer(QWidget):
         self.input3 = QLineEdit()
         self.button = QPushButton("판별하기")
         self.button.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        self.button.clicked.connect(self.predict)
+        self.button.clicked.connect(self.view_model.predict)
 
-        input_layout.addWidget(self.input1, 0, 0, 1, 2)  # 행 0, 열 0, 행 스팬 1, 열 스팬 2
-        input_layout.addWidget(self.input2, 1, 0, 1, 2)  # 행 1, 열 0, 행 스팬 1, 열 스팬 2
-        input_layout.addWidget(self.input3, 2, 0, 1, 2)  # 행 2, 열 0, 행 스팬 1, 열 스팬 2
-        input_layout.addWidget(self.button, 0, 2, 3, 1)  # 행 0, 열 2, 행 스팬 3, 열 스팬 1
+        input_layout.addWidget(self.input1, 0, 0, 1, 2)
+        input_layout.addWidget(self.input2, 1, 0, 1, 2)
+        input_layout.addWidget(self.input3, 2, 0, 1, 2)
+        input_layout.addWidget(self.button, 0, 2, 3, 1)
 
         self.up_layout = QHBoxLayout()
         self.dw_layout = QVBoxLayout()
@@ -153,32 +137,38 @@ class TriangleVisualizer(QWidget):
         self.layout.addLayout(self.up_layout)
         self.layout.addLayout(self.dw_layout)
 
-        self.layout.setContentsMargins(10, 10, 10, 10)  # 전체 레이아웃에 패딩 추가
-        self.dw_layout.setContentsMargins(0, 0, 0, 10)  # 캔버스 아래에 약간의 여백 추가
+        self.layout.setContentsMargins(10, 10, 10, 10)
+        self.dw_layout.setContentsMargins(0, 0, 0, 10)
 
         self.setLayout(self.layout)
 
-    def predict(self):
-        if self.model is None:
-            self.result_label.setText("모델이 로드되지 않았습니다.")
-            return
+    def set_result_label(self, text):
+        self.result_label.setText(text)
 
+    def set_canvas_data(self, sides, prediction):
+        self.canvas.set_sides_and_prediction(sides, prediction)
+
+class TriangleVisualizer:
+    def __init__(self):
+        self.model = TriangleModel(model_path)
+        self.view = TriangleView(self)
+        self.view.show()
+
+    def predict(self):
         try:
-            a, b, c = float(self.input1.text()), float(self.input2.text()), float(self.input3.text())
-            self.sides = sorted([a, b, c])  # 정렬하여 가장 긴 변을 마지막에 둠
-            data = np.array([[a, b, c]]) / 255.0  # 정규화
-            self.prediction = self.model.predict(data)[0][0]
-            result = "삼각형 가능" if self.prediction > 0.9 else "삼각형 불가능"
-            self.result_label.setText(f"결과")
-            #self.result_label.setText(f"결과: {result} (확률: {self.prediction:.2f})")
-            self.canvas.set_sides_and_prediction(self.sides, self.prediction)
+            a, b, c = float(self.view.input1.text()), float(self.view.input2.text()), float(self.view.input3.text())
+            self.sides = sorted([a, b, c])
+            prediction = self.model.predict(self.sides)
+            result = "삼각형 가능" if prediction > 0.9 else "삼각형 불가능"
+            self.view.set_result_label(f"결과: {result} (확률: {prediction:.2f})")
+            self.view.set_canvas_data(self.sides, prediction)
+            self.view.set_canvas_data(self.sides, prediction)
         except ValueError:
-            self.result_label.setText("올바른 숫자를 입력하세요.")
+            self.view.set_result_label("올바른 숫자를 입력하세요.")
         except Exception as e:
-            self.result_label.setText(f"예측 오류: {e}")
+            self.view.set_result_label(f"예측 오류: {e}")
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = TriangleVisualizer()
-    window.show()
     sys.exit(app.exec())
