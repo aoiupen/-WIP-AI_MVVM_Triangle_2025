@@ -169,5 +169,5 @@
 
 ## 결과 시각화
 
-![예측 결과 시각화](src/visual.png)
-![예측 결과 시각화](src/visual2.png)
+![예측 결과 시각화](src/visual3.png)
+![예측 결과 시각화](src/visual4.png)
