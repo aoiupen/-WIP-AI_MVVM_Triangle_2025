@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
+import Qt5Compat.GraphicalEffects
 
 ApplicationWindow {
     id: appWindow
@@ -52,9 +53,9 @@ ApplicationWindow {
                 Text {
                     Layout.fillWidth: true
                     text: "Triangle Validator"
-                    font.pixelSize: 36  // 텍스트 크기 조정 (36pt)
+                    font.pixelSize: 32 
                     font.weight: Font.DemiBold
-                    font.letterSpacing: -0.72  // 자간 조정 (-2%)
+                    font.letterSpacing: -0.72 
                     color: textColor
                 }
                 
@@ -96,7 +97,11 @@ ApplicationWindow {
             Layout.fillWidth: true
             Layout.preferredHeight: 220
             radius: 8
-            color: cardColor
+            gradient: Gradient {
+            GradientStop { position: 0.0; color: "#2980b9" } // 시작 색상
+            GradientStop { position: 1.0; color: "#6dd5fa" } // 끝 색상
+            }
+            //color: cardColor
             border.color: borderColor
             border.width: 1
             
@@ -111,7 +116,7 @@ ApplicationWindow {
                     font.pixelSize: 24  // 텍스트 크기 조정 (18pt에서 더 크게)
                     font.weight: Font.Medium
                     font.letterSpacing: -0.48  // 자간 조정 (-2%)
-                    color: textColor
+                    color: "white"
                 }
 
                 // 입력 필드들과 버튼을 포함하는 레이아웃
@@ -126,7 +131,10 @@ ApplicationWindow {
                         Layout.fillWidth: true
                         Layout.preferredHeight: 50
                         radius: 8
-                        color: inputBgColor
+                        gradient: Gradient {
+                        GradientStop { position: 0.0; color: "lightsteelblue" } // 시작 색상
+                        GradientStop { position: 1.0; color: "cornflowerblue" } // 끝 색상
+                        }
                         
                         TextInput {
                             id: input1
@@ -147,7 +155,7 @@ ApplicationWindow {
                                 verticalAlignment: Text.AlignVCenter
                                 text: "첫 번째 변의 길이"
                                 font.pixelSize: 18  // 텍스트 크기 조정 (18pt)
-                                color: textColor
+                                color: "white"
                                 opacity: 0.5
                                 visible: input1.text === ""
                             }
@@ -161,14 +169,17 @@ ApplicationWindow {
                         Layout.preferredWidth: 80
                         Layout.fillHeight: true
                         radius: 8
-                        color: primaryColor
-                        
+                        gradient: Gradient {
+                        GradientStop { position: 0.0; color: "#eeeeee" } // 시작 색상
+                        GradientStop { position: 1.0; color: "#aaaaaa" } // 끝 색상
+                        }
+                                    
                         MouseArea {
                             anchors.fill: parent
                             onClicked: {
                                 console.log("판별하기 버튼 클릭됨");
                                 triangleVisualizer.predict(input1.text, input2.text, input3.text);
-                                parent.color = "#0066d6"  // 클릭 효과
+                                parent.color = "white"  // 클릭 효과
                                 clickTimer.start()
                             }
                         }
@@ -262,7 +273,10 @@ ApplicationWindow {
             Layout.fillWidth: true
             Layout.preferredHeight: 120
             radius: 8
-            color: cardColor
+            gradient: Gradient {
+            GradientStop { position: 0.0; color: "#2980b9" } // 시작 색상
+            GradientStop { position: 1.0; color: "#6dd5fa" } // 끝 색상
+            }
             border.color: borderColor
             border.width: 1
             
