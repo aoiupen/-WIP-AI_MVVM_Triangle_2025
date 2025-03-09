@@ -21,7 +21,7 @@
 - 삼각형 성립 검증 : 입력 받은 세 변의 길이
 - 크로스 체크 : 수학적 방법 (삼각형 부등식)과 AI 모델 예측
 
-## 기술 스택
+### 기술 스택
 
 - **UI :** PyQt/PySide6 → QML (최신 UI/UX)
 - **아키텍처 :** 모놀리식 → MVVM 패턴 (유지 보수 및 확장성)
@@ -29,7 +29,7 @@
 
 ### 시각화
 
-![예측 결과 시각화](assets/images/visual5.png)
+<img src="assets/images/visual5.png" width="30%" alt="예측 결과 시각화">
 
 
 <details>
