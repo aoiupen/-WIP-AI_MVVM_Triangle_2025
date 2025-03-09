@@ -26,14 +26,18 @@
 - **UI :** PyQt/PySide6 → QML (최신 UI/UX)
 - **아키텍처 :** 모놀리식 → MVVM 패턴 (유지 보수 및 확장성)
 - **배포 :** 로컬 → Docker, PyInstaller 지원 준비 중 (다양한 환경 지원)
-정
+
+### 시각화
+
+![예측 결과 시각화](assets/images/visual5.png)
+
 
 <details>
 <summary>AI 모델 개발 과정 (Click)</summary>
 
 ### 데이터셋
 
-*   **생성 방법 :** 세 변의 길이로 구성된 OK/NG 삼각형 데이터를 1,000,000개씩 생성. 
+*   **생성 방법 :** 세 변의 길이로 구성된 OK/NG 삼각형 데이터를 1,000,000개씩 생성
 *   **데이터 형식 :** (3, 1) 형태의 NumPy 배열
 *   **전처리 :** StandardScaler 사용하여 정규화
 
