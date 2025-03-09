@@ -26,36 +26,29 @@
 - **UI :** PyQt/PySide6 → QML (최신 UI/UX)
 - **아키텍처 :** 모놀리식 → MVVM 패턴 (유지 보수 및 확장성)
 - **배포 :** 로컬 → Docker, PyInstaller 지원 준비 중 (다양한 환경 지원)
-
-## 결과 시각화
-
-![예측 결과 시각화](assets/images/visual3.png)
-
----
-
-## 부록: AI 모델 개발 상세 정보
+정
 
 <details>
 <summary>AI 모델 개발 과정 (Click)</summary>
 
 ### 데이터셋
 
-*   **생성 방법:** `gen_triangle_sides` 함수를 사용하여 세 변의 길이로 구성된 OK/NG 삼각형 데이터를 1,000,000개씩 생성. 
-*   **데이터 형식:** (3, 1) 형태의 NumPy 배열
-*   **전처리:** StandardScaler 사용하여 정규화
+*   **생성 방법 :** 세 변의 길이로 구성된 OK/NG 삼각형 데이터를 1,000,000개씩 생성. 
+*   **데이터 형식 :** (3, 1) 형태의 NumPy 배열
+*   **전처리 :** StandardScaler 사용하여 정규화
 
 ### 모델 구조
 
-*   **종류:** Sequential
-*   **입력층:** Flatten layer (3, 1) 배열을 1차원으로 펼침
-*   **은닉층:** Dense layer (64개 노드, ReLU 활성화 함수)
-*   **출력층:** Dense layer (1개 노드, Sigmoid 활성화 함수)
+*   **종류 :** Sequential
+*   **입력층 :** Flatten layer (3, 1) 배열을 1차원으로 펼침
+*   **은닉층 :** Dense layer (64개 노드, ReLU 활성화 함수)
+*   **출력층 :** Dense layer (1개 노드, Sigmoid 활성화 함수)
 
 ### 학습 과정
 
-*   **손실 함수:** Binary Cross-Entropy
-*   **옵티마이저:** Adam
-*   **학습 횟수 (Epochs):** 8
+*   **손실 함수 :** Binary Cross-Entropy
+*   **옵티마이저 :** Adam
+*   **학습 횟수 (Epochs) :** 8
 
 ### 모델 학습 코드
 
