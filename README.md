@@ -1,31 +1,71 @@
-# AI 삼각형 검증기 (AI Triangle Validator)
+# AI 삼각형 검증 앱 (AI Triangle Validator)
 
-## 소개
+- 하나의 아이디어, 통합 프로덕션, 크로스 플랫폼
 
-- AI 활용한 소규모 프로토타입 제작
-
-### 목적
+## 개요
 
 - **실험적 접근 :** 간단한 기하학 문제 해결을 소규모 AI 프로젝트화
 - **통합 프로덕션 :** 기획-개발-디자인-테스트의 전 과정을 구현
-- **지속적 개선 :** 기술 스택과 아키텍처 개선
+- **크로스 플랫폼 :** 다양한 프레임워크, 배포 환경 지원
 
-### 발전
+## 주요 기능
 
-- **1단계 :** Model : 삼각형 검증 AI 모델 개발
-- **2단계 :** PyQt 기반 UI 구현
-- **3단계 :** 선언형 UI QML로 전환, MVVM 아키텍처 적용 
+- **삼각형 성립 검증:** 입력 받은 세 변의 길이로 삼각형 형성 가능 여부 확인
+- **크로스 체크:** 수학적 방법(삼각형 부등식)과 AI 모델 예측 결과 비교
 
-### 기능
+## 발전
 
-- 삼각형 성립 검증 : 입력 받은 세 변의 길이
-- 크로스 체크 : 수학적 방법 (삼각형 부등식)과 AI 모델 예측
+### 1단계 : 핵심 기능 구현 [v1.0.0]
+- 삼각형 검증 AI 모델 개발
+- PyQt,PySide 기반 UI 개발
 
-### 기술 스택
+### 2단계 : UI, 아키텍처 개선 [진행 중]
+- QML 기반 선언형 UI 도입
+- Figma 활용한 UI 디자인
+- MVVM 기반 4계층 아키텍처 도입
+- ML 모델 어댑터 패턴 적용
+- 코드 모듈화 및 재구성
 
-- **UI :** PyQt/PySide6 → QML (최신 UI/UX)
-- **아키텍처 :** 모놀리식 → MVVM 패턴 (유지 보수 및 확장성)
-- **배포 :** 로컬 → Docker, PyInstaller 지원 준비 중 (다양한 환경 지원)
+### 3단계 : 크로스 플랫폼 지원 [예정]
+
+## 기술 스택
+
+- **백엔드 :** Python, TensorFlow
+- **프론트엔드 :** PyQt/PySide6 (완료), QML (진행 중)
+- **아키텍처 :** 4계층 구조, 어댑터 패턴
+- **배포 환경 :** Docker, PyInstaller (진행 중)
+- **개발 도구 :** Git, Github
+
+## 아키텍처 개요
+
+4계층 아키텍처를 사용하여 UI와 ML 모델 간의 의존성을 최소화
+
+- **View 레이어 :** QML 기반 사용자 인터페이스
+- **ViewModel 레이어 :** UI와 핵심 로직 연결
+- **Core 레이어 :** 핵심 비즈니스 로직
+- **Model 레이어 :** ML 모델 및 어댑터
+
+## 프로젝트 구조
+
+triangle-validator/
+├── core/ # 핵심 비즈니스 로직
+│ └── triangle_validator.py
+├── models/ # ML 모델 및 어댑터
+│ ├── triangle_model.py
+│ └── adapters/
+│ └── tf_adapter.py
+├── viewmodels/ # ViewModel 계층
+│ └── triangle_viewmodel.py
+├── views/ # View 계층 (QML UI)
+│ └── triangle_view.qml
+├── assets/ # 이미지 및 리소스
+│ └── images/
+└── docs/ # 문서
+
+
+## 배포 환경
+
+현재 네이티브 Python 환경에서 실행 가능하며, 추후 Docker, PyInstaller 패키징과 Windows/Linux 네이티브 지원을 계획 중입니다.
 
 ### 시각화
 
