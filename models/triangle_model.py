@@ -1,26 +1,40 @@
-import numpy as np
-import tensorflow as tf
-import os
-import sys
-
-# 모델 파일 경로 설정
-if getattr(sys, 'frozen', False):
-    model_path = os.path.join(sys._MEIPASS, 'model.h5')
-else:
-    # 모델 파일이 notebooks 폴더로 이동했으므로 경로 수정
-    model_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'notebooks', 'model.h5')
-
 class TriangleModel:
-    """TensorFlow 모델을 사용하여 삼각형 가능 여부를 예측하는 클래스"""
-    def __init__(self, model_path=model_path):
-        self.model = tf.keras.models.load_model(model_path)
-
-    def predict(self, sides):
-        data = np.array([sides]) / 255.0
-        prediction = self.model.predict(data)
-        return prediction.item()
-
-def is_triangle_possible(sides):
-    """삼각형 부등식을 사용하여 삼각형 가능 여부를 판단합니다."""
-    a, b, c = sides
-    return (a + b > c) and (a + c > b) and (b + c > a) 
+    """삼각형을 표현하는 도메인 모델 클래스"""
+    
+    def __init__(self, validator):
+        """
+        삼각형 모델 초기화
+        
+        Args:
+            validator: TriangleValidatorCore 인스턴스
+        """
+        self.validator = validator
+        self.sides = [0, 0, 0]
+        self.math_result = False
+        self.ai_prediction_value = 0.0
+        self.is_valid_by_ai = False
+        self.is_consistent = False
+    
+    def validate(self, a, b, c):
+        """
+        세 변의 길이로 삼각형을 검증합니다.
+        
+        Args:
+            a, b, c: 삼각형의 세 변 길이
+            
+        Returns:
+            검증 결과를 담은 딕셔너리
+        """
+        # 입력값 정규화 (오름차순 정렬)
+        self.sides = sorted([float(a), float(b), float(c)])
+        
+        # 검증 수행
+        result = self.validator.validate(*self.sides)
+        
+        # 결과 저장
+        self.math_result = result["math_result"]
+        self.ai_prediction_value = result["ai_prediction_value"]
+        self.is_valid_by_ai = result["is_valid_by_ai"]
+        self.is_consistent = result["is_consistent"]
+        
+        return result

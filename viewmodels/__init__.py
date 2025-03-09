@@ -1,4 +1,4 @@
 # viewmodels 패키지
-from .triangle_visualizer import TriangleVisualizer
+from .triangle_viewmodel import TriangleViewModel
 
-__all__ = ['TriangleVisualizer'] 
+__all__ = ['TriangleViewModel'] 
