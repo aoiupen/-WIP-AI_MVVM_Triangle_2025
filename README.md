@@ -8,7 +8,7 @@
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 <p align="center">
-  <img src="assets/images/visual5.png" width="40%" alt="Triangle Validator UI">
+  <img src="assets/images/visual_dev.png" alt="Triangle Validator UI">
 </p>
 
 ## 📋 Overview
