@@ -8,6 +8,9 @@ MLModelAdapter 인터페이스를 구현하여 TensorFlow 의존성을 캡슐화
 import numpy as np
 from models.adapters.base_adapter import MLModelAdapter
 import os
+import logging
+
+logger = logging.getLogger(__name__)
 
 class TensorFlowAdapter(MLModelAdapter):
     """
@@ -28,70 +31,63 @@ class TensorFlowAdapter(MLModelAdapter):
             object: 로드된 TensorFlow 모델
         
         Raises:
-            Exception: 모델 로드 실패 시 발생
+            FileNotFoundError: 모델 파일이 존재하지 않을 경우
+            Exception: 기타 모델 로드 실패 시 발생
         """
         import tensorflow as tf
         
+        if not os.path.exists(model_path):
+            logger.error(f"모델 파일을 찾을 수 없습니다: {model_path}")
+            raise FileNotFoundError(f"모델 파일 '{model_path}'이 존재하지 않습니다.")
+        
         try:
-            if os.path.exists(model_path):
-                # 실제 모델 파일이 존재하는 경우
-                model = tf.keras.models.load_model(model_path)
-                print(f"모델 파일 '{model_path}'을 성공적으로 로드했습니다.")
-            else:
-                # 모델 파일이 없는 경우 경고 로그 출력
-                print(f"모델 파일 '{model_path}'이 존재하지 않습니다. 기본 모델을 생성합니다.")
-                
-                # 기본 모델 생성
-                model = tf.keras.Sequential([
-                    tf.keras.layers.Dense(64, activation='relu', input_shape=(3,)),
-                    tf.keras.layers.Dense(1, activation='sigmoid')
-                ])
-                model.compile(optimizer='adam', loss='binary_crossentropy')
-                
-                # 모델 저장 디렉토리 생성 (선택사항)
-                try:
-                    os.makedirs(os.path.dirname(model_path), exist_ok=True)
-                    model.save(model_path)
-                    print(f"기본 모델을 '{model_path}'에 저장했습니다.")
-                except Exception as save_error:
-                    print(f"기본 모델 저장 실패: {str(save_error)}")
-            
+            model = tf.keras.models.load_model(model_path)
+            logger.info(f"모델 파일 '{model_path}'을 성공적으로 로드했습니다.")
             return model
         except Exception as e:
-            raise Exception(f"TensorFlow 모델 로드 실패: {str(e)}")
+            logger.error(f"TensorFlow 모델 로드 중 오류 발생 ({model_path}): {e}", exc_info=True)
+            raise Exception(f"TensorFlow 모델 로드 실패 ({model_path}): {str(e)}")
     
-    def predict(self, model, input_data):
+    def predict(self, model, input_data, scaler=None):
         """
         TensorFlow 모델을 사용하여 예측을 수행합니다.
         
         Args:
             model (tf.keras.Model): 로드된 TensorFlow 모델
             input_data (list or numpy.ndarray): 입력 데이터
+            scaler (sklearn.preprocessing.StandardScaler, optional): 학습된 스케일러 객체. Defaults to None.
             
         Returns:
             float: 예측 결과 (0~1 사이 값)
         """
-        import tensorflow as tf
-        import numpy as np
-        
+        if scaler is None:
+            logger.error("예측을 위한 스케일러(scaler) 객체가 제공되지 않았습니다.")
+            raise ValueError("스케일러 객체가 필요합니다.")
+
         try:
-            # 입력 데이터 전처리
+            # 입력 데이터 전처리 (numpy array로 변환)
             if isinstance(input_data, list):
-                input_data = np.array(input_data)
+                processed_input_data = np.array(input_data)
+            elif isinstance(input_data, np.ndarray):
+                processed_input_data = input_data
+            else:
+                logger.error(f"잘못된 input_data 타입: {type(input_data)}")
+                raise ValueError("input_data는 list 또는 numpy.ndarray 여야 합니다.")
+
+            if len(processed_input_data.shape) == 1:
+                processed_input_data = processed_input_data.reshape(1, -1)
             
-            # 입력 형태 조정 (모델에 맞게)
-            if len(input_data.shape) == 1:
-                input_data = input_data.reshape(1, -1)
-            
-            # 정규화 (필요한 경우)
-            input_data = input_data / 255.0  # 예시: 0-255 값을 0-1로 정규화
-            
+            # 제공된 스케일러로 변환
+            scaled_data = scaler.transform(processed_input_data)
+            logger.debug(f"스케일링된 데이터: {scaled_data.tolist()}")
+
             # 예측 수행
-            prediction = model.predict(input_data)
-            
-            # 결과 처리 (예: 첫 번째 출력값 반환)
-            return float(prediction[0][0])
+            prediction = model.predict(scaled_data)
+            result = float(prediction[0][0])
+            logger.debug(f"모델 예측 결과 (raw): {prediction.tolist()}, 최종 반환 값: {result}")
+            return result
         except Exception as e:
+            logger.error(f"TensorFlow 예측 실패: {e}", exc_info=True)
             raise Exception(f"TensorFlow 예측 실패: {str(e)}")
     
     def get_framework_name(self):

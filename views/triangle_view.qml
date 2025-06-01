@@ -226,6 +226,37 @@ ApplicationWindow {
             }
         }
 
+        // AI 예측 결과 표시 Label (OK/NG)
+        Text {
+            id: predictionResultLabel
+            Layout.alignment: Qt.AlignHCenter
+            Layout.bottomMargin: 5 // 버튼과의 간격
+            font.pixelSize: 20
+            font.bold: true
+            // triangleVisualizer.prediction 값이 0.0에서 1.0 사이의 float이라고 가정
+            // ViewModel에 prediction Property가 있어야 함
+            text: {
+                if (typeof triangleVisualizer.prediction === 'undefined' || triangleVisualizer.prediction === null) {
+                    "---"; // 초기값
+                } else if (triangleVisualizer.prediction >= 0.5) {
+                    "OK";
+                } else {
+                    "NG";
+                }
+            }
+            color: {
+                if (typeof triangleVisualizer.prediction === 'undefined' || triangleVisualizer.prediction === null) {
+                    "black"; // 초기 색상
+                } else if (triangleVisualizer.prediction >= 0.5) {
+                    "green";
+                } else {
+                    "red";
+                }
+            }
+            // 초기에는 보이지 않게 하거나, ViewModel의 상태에 따라 visible 제어 가능
+            // visible: triangleVisualizer.prediction !== null 
+        }
+
         // Check 버튼 - 위치 조정
         Rectangle {
             Layout.alignment: Qt.AlignHCenter
