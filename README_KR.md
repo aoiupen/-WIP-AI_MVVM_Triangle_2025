@@ -8,7 +8,7 @@
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 <p align="center">
-  <img src="assets/images/visual5.png" width="40%" alt="삼각형 검증 UI">
+  <img src="assets/images/visual_dev.png" alt="삼각형 검증 UI">
 </p>
 
 ## 📋 개요
